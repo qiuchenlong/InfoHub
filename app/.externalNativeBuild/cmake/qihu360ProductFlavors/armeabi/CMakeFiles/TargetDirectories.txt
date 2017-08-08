@@ -1,0 +1,3 @@
+/Users/qiuchenlong/Desktop/Android/InfoHub/app/.externalNativeBuild/cmake/qihu360ProductFlavors/armeabi/CMakeFiles/edit_cache.dir
+/Users/qiuchenlong/Desktop/Android/InfoHub/app/.externalNativeBuild/cmake/qihu360ProductFlavors/armeabi/CMakeFiles/rebuild_cache.dir
+/Users/qiuchenlong/Desktop/Android/InfoHub/app/.externalNativeBuild/cmake/qihu360ProductFlavors/armeabi/CMakeFiles/native-lib.dir

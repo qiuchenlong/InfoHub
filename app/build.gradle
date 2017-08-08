@@ -1,0 +1,276 @@
+apply plugin: 'AndResGuard'
+apply plugin: 'com.android.application'
+//apply plugin: 'io.fabric'
+
+
+buildscript {
+
+    repositories {
+//        mavenLocal()
+        jcenter()
+//        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        // The Fabric Gradle plugin uses an open ended version to react
+        // quickly to Android tooling updates
+//        classpath 'io.fabric.tools:gradle:latest.integration'
+//        classpath ("com.tencent.mm:AndResGuard-gradle-plugin:${ANDRESGUARD_VERSION}") { changing=true }
+    }
+
+
+}
+
+andResGuard {
+//    mappingFile = file("./resource_mapping.txt")
+    mappingFile = null
+    // It will be invalid when you sign apk with schemeV2
+    use7zip = true
+    useSign = true
+    // 打开这个开关，会keep住所有资源的原始路径，只混淆资源的名字
+    // it will keep the origin path of your resources when it's true
+    keepRoot = false
+    whiteList = [
+            "R.mipmap.ic_launcher",
+            "R.mipmap.app_icon",
+            "R.id.*"
+//            // your icon
+//            "R.drawable.icon",
+//            // for fabric
+//            "R.string.com.crashlytics.*",
+//            // for umeng update
+//            "R.string.umeng*",
+//            "R.string.UM*",
+//            "R.string.tb_*",
+//            "R.layout.umeng*",
+//            "R.layout.tb_*",
+//            "R.drawable.umeng*",
+//            "R.drawable.tb_*",
+//            "R.anim.umeng*",
+//            "R.color.umeng*",
+//            "R.color.tb_*",
+//            "R.style.*UM*",
+//            "R.style.umeng*",
+//            "R.id.umeng*",
+//            // umeng share for sina
+//            "R.drawable.sina*",
+//            // for google-services.json
+//            "R.string.google_app_id",
+//            "R.string.gcm_defaultSenderId",
+//            "R.string.default_web_client_id",
+//            "R.string.ga_trackingId",
+//            "R.string.firebase_database_url",
+//            "R.string.google_api_key",
+//            "R.string.google_crash_reporting_api_key"
+    ]
+    compressFilePattern = [
+            "*.png",
+            "*.jpg",
+            "*.jpeg",
+            "*.gif",
+            "resources.arsc"
+    ]
+    sevenzip {
+        artifact = 'com.tencent.mm:SevenZip:1.1.14'
+//        artifact = "com.tencent.mm:SevenZip:${ANDRESGUARD_VERSION}"
+        //path = "/usr/local/bin/7za"
+    }
+}
+
+
+
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
+    defaultConfig {
+        applicationId "com.a10.infohub"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // gradle多分包
+        multiDexEnabled true
+    }
+    // dex 配置
+    dexOptions {
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+        additionalParameters = [//dex参数详见 dx --help
+                                '--multi-dex',//多分包
+                                '--set-max-idx-number=60000',//每个包内方法数上限
+                                '--main-dex-list='+project.rootDir.absolutePath+'/app/infohub_main_dex_list.txt',//打包进主classes.dex的文件列表
+                                '--minimal-main-dex'//使上一句生效
+        ]
+    }
+
+
+    // 签名
+    signingConfigs {
+        debug {
+//            storeFile file("keystore/test.jks")
+//            keyAlias      "test"
+//            storePassword "test"
+//            keyPassword   "test"
+        }
+        release {
+            storeFile //file("keystore/test.jks")
+            storePassword //"test"
+            keyAlias      //"test"
+            keyPassword   //"test"
+        }
+    }
+
+    buildTypes {
+        release {
+            // 混淆
+            minifyEnabled true
+            // Zipalign优化
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+//            signingConfig signingConfigs.release
+
+
+        }
+        debug {
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.debug
+        }
+
+
+        productFlavors {
+            wandoujia {
+                manifestPlaceholders = [CHANNEL_VALUE: 'wandoujia' , CHANNEL_ID:200]
+            }
+            qihu360 {
+                manifestPlaceholders = [CHANNEL_VALUE: '360' , CHANNEL_ID:201]
+            }
+            baidu {
+                manifestPlaceholders = [CHANNEL_VALUE: 'baidu' , CHANNEL_ID:202]
+            }
+        }
+
+
+        // 将release版本的包名重命名，加上版本及日期
+        // 格式为 app名_版本号_打包时间_渠道名_release.apk
+        applicationVariants.all{ variant ->
+            variant.outputs.each{ output ->
+                def outputFile = output.outputFile
+                if (outputFile != null && outputFile.name.endsWith('release.apk')){
+                    def releaseApkName = getProductName() + "_${defaultConfig.versionName}_${releaseTime()}_" + variant.productFlavors[0].name + "_release.apk"
+                    output.outputFile = new File(outputFile.parent, releaseApkName)
+                }
+            }
+        }
+    }
+    lintOptions {
+        //忽略一些构建信息，降低对错误的检查
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    packagingOptions {
+//        exclude '.readme'
+//        exclude 'META-INF/DEPENDENCIES'
+//        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+//        exclude 'META-INF/maven/com.nineoldandroids/library/pom.xml'
+//        exclude 'META-INF/maven/com.nineoldandroids/library/pom.properties'
+    }
+    externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }
+}
+
+//afterEvaluate {
+//    println("infohub--afterEvaluate")
+//    println(project.rootDir.absolutePath)
+//    tasks.matching {
+//        it.name.startsWith('dex')
+//    }.each { dx->
+//        // 定义主包包含的类列表
+//        def listFile = project.rootDir.absolutePath + '/app/infohub_main_dex_list.txt'
+//        println("infohub--root dir:" + project.rootDir.absolutePath)
+//        println("dex task found" + dx.name)
+//        if (dx.additionalParameters == null) {
+//            dx.additionalParameters = []
+//        } else {
+//            dx.additionalParameters += '--multi-dex'
+//            dx.additionalParameters += '--main-dex-list=' + listFile
+//            dx.additionalParameters += '--minimal-main-dex'
+//        }
+//    }
+//}
+
+
+
+
+
+//获取生成的产品名
+def getProductName() {
+    return "Infohub"
+}
+
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd",TimeZone.getTimeZone("UTC"))
+}
+
+//def vCode() {
+//    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+//}
+
+
+
+//配置打包签名
+File propFile = file('signing.properties');
+if (propFile.exists()) {
+    def Properties props = new Properties()
+    props.load(new FileInputStream(propFile))
+    if (props.containsKey('STORE_FILE') && props.containsKey('STORE_PASSWORD') &&
+            props.containsKey('KEY_ALIAS') && props.containsKey('KEY_PASSWORD')) {
+        android.signingConfigs.release.storeFile = file(props['STORE_FILE'])
+        android.signingConfigs.release.storePassword = props['STORE_PASSWORD']
+        android.signingConfigs.release.keyAlias = props['KEY_ALIAS']
+        android.signingConfigs.release.keyPassword = props['KEY_PASSWORD']
+    } else {
+        android.buildTypes.release.signingConfig = null
+    }
+} else {
+    android.buildTypes.release.signingConfig = null
+}
+
+
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:support-v4:25.2.0'
+    compile 'com.android.support:recyclerview-v7:25.2.0'
+    compile 'com.android.support:design:25.2.0'
+
+    //添加multidex的外部依赖jar包
+    compile 'com.android.support:multidex:1.0.0'
+
+    // 网络请求框架
+    compile 'com.android.volley:volley:1.0.0'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'org.xutils:xutils:3.3.36'
+
+    testCompile 'junit:junit:4.12'
+}

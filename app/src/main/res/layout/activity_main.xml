@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="点击跳转插件app"
+        android:onClick="startOther"/>
+
+    <android.support.design.internal.BaselineLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        android:layout_margin="5dp"
+        android:background="#4400ff00"
+        >
+        <TextView
+            android:text="结果"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:elevation="10dp"
+            android:background="@drawable/myrect"
+            android:textColor="#dddddd"
+            />
+    </android.support.design.internal.BaselineLayout>
+
+    <TextView
+        android:text="结果"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:elevation="20dp"
+        android:background="@drawable/myrect"
+        android:textColor="#dddddd"
+        android:padding="5dp"
+        android:id="@+id/result" />
+
+    <Button
+        android:text="计算"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/calculator" />
+
+    <Button
+        android:text="修复"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fix" />
+
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </LinearLayout>
+
+    <com.a10.infohub.ui.Linerlayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/activity_main_linerlayout">
+        <TextView
+            style="@style/text_flag_01"
+            android:text="hello"/>
+        <TextView
+            style="@style/text_flag_01"
+            android:text="邱晨龙"
+            android:textSize="18sp"/>
+        <TextView
+            style="@style/text_flag_01"
+            android:text="Cyndi"
+            android:textSize="28sp"/>
+        <TextView
+            style="@style/text_flag_01"
+            android:text="福州大学"
+            android:textSize="25sp"/>
+        <TextView
+            style="@style/text_flag_01"
+            android:text="厦门"/>
+        <TextView
+            style="@style/text_flag_01"
+            android:text="hello"/>
+        <TextView
+            style="@style/text_flag_01"
+            android:text="十全十美网络有限公司"
+            android:textSize="20sp"/>
+    </com.a10.infohub.ui.Linerlayout>
+
+
+</LinearLayout>
